@@ -1,0 +1,8 @@
+[Variables]
+mainboard_fan_target_temp_steppers_on = 30
+printer_stock_max_accel = 1500
+filament_loaded = True
+filament_sensor = {'toolhead_runout': 3, 'runout': 4}
+plates = {'array': [{'name': 'Mueller', 'offset': 0.0}, {'name': 'Energetics', 'offset': 0.0}, {'name': 'Texture', 'offset': -0.1}, {'name': 'En_Thick', 'offset': 0.0}], 'index': 0}
+pressure_advance = [{'id': 'Overture_PLA_Black', 'val': [{'nozzle': 0.4, 'pa': 0.2, 'st': 0.04}, {'nozzle': 0.6, 'pa': 0.0, 'st': 0.04}]}, {'id': 'DEFAULT_PLA', 'val': [{'nozzle': 0.4, 'pa': 0.2, 'st': 0.04}]}]
+print_stats = {'filament': 0.0, 'time': {'filter': 0, 'total': 0, 'service': 0}}

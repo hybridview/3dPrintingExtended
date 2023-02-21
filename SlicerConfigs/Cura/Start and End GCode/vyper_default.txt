@@ -1,0 +1,27 @@
+
+;;
+;; START GCODE
+;;
+
+G21 ;metric values
+G90 ;absolute positioning
+M82 ;set extruder to absolute mode
+M107 ;start with the fan off
+G28 X0 Y0 ;move X/Y to min endstops
+M300 S1318 P266
+G28 Z0 ;move Z to min endstops
+G0 Z0.2
+G92 E0 ;zero the extruded length
+G1 X40 E25 F400 ; Extrude 25mm of filament in a 4cm line. Reduce speed (F) if you have a nozzle smaller than 0.4mm!
+G92 E0 ;zero the extruded length again
+G1 E-1 F500 ; Retract a little
+G1 X80 F4000 ; Quickly wipe away from the filament line
+M117 ; Printing…
+G5
+
+
+
+
+;;
+;; END GCODE
+;;

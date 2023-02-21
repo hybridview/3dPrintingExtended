@@ -1,0 +1,89 @@
+
+;;
+;; START GCODE
+;; Kobra_ABM - v20230320
+
+;; ABM
+;; TODO: Finish good nozzle wipe.
+M140 S{material_bed_temperature_layer_0} ; Turn on bed heater right away (ABM)
+M104 S160; Turn on hotend, but start at standby temperature to prevent baking filament. (ABM)
+G21 ;metric values
+G90 ;absolute positioning
+M82 ;set extruder to absolute mode
+M107 ;start with the fan off
+M300 S1318 P266
+G28 Z0 ;move Z to min endstops. We are now back at middle of bed.
+G28 X0 Y0 ;move X/Y to min endstops
+; At this point, Nozzle is just off front corner of bed.
+M190 S{material_bed_temperature_layer_0}; Wait for bed to get up to temperature
+M109 S{material_print_temperature_layer_0}; Wait for extruder to get up to final temperature
+G0 Z2.0 ; Move nozzle down to above surface without scraping.
+G92 E0 ;zero the extruded length
+M501 ; Restore settings from EEPROM. (Needed?)
+M420 S1 ; Turn bed leveling back on that g28 turns off...
+G1 E15 F400 ;
+;G1 X40 E25 F500 ; Extrude 25mm of filament in a 4cm line.
+G92 E0 ;zero the extruded length again
+G1 X10 E-0.5 F500 ; Retract a little as we move over bed
+G1 X70 F4000 ; Quickly wipe away from the filament line
+M117 ; Printing…
+G5
+
+
+
+
+;;
+;; END GCODE
+;; Kobra_ABM - v20230320
+
+M117 Cooling down...
+M140 S0 ; turn off bed
+G91 ;relative positioning
+G1 E-1 F300 ;retract the filament a bit before lifting the nozzle, to release some of the pressure
+G1 Z+0.5 E-1 ;X-20 Y-20 F240 ;move Z up a bit and retract filament even more
+M104 S0 ; turn off extruder
+G28 X0 ;move X to min endstops, so the head is out of the way
+G90 ;Absolute positioning
+G1 Y200 F2000 ;Present print
+M107 ; print cooling fan off
+M84 ;steppers off
+M300 P300 S4000
+M117 Finished.
+
+
+
+;;
+;; START GCODE: Auto leveling before print
+;; Kobra_ABM - v20230320
+
+M104 S160; Turn on hotend, but start at standby temperature to prevent baking filament. (ABM)
+M107 ;turn off fan
+G28 X0 Y0 Z0 ; home X, Y and Z axis end-stops
+G29 ; initiate z-probing
+G0 X0 Y0 F9000 ; Go to front
+M190 S{material_bed_temperature_layer_0}; Wait for bed to get up to temperature
+M109 S{material_print_temperature_layer_0}; Wait for extruder to get up to final temperature
+G0 Z0.15 ; Drop to bed
+G92 E0 ; zero the extruded length
+G1 X40 E25 F500 ; Extrude 25mm of filament in a 4cm line
+G92 E0 ; zero the extruded length
+G1 E-1 F500 ; Retract a little
+G1 X80 F4000 ; Quickly wipe away from the filament line
+G1 Z0.3 ; Raise and begin printing.
+
+
+;;
+;; REF START CODE that has wipe
+;; https://www.reddit.com/r/anycubic/comments/eu7mws/nozzle_wipe_starting_g_code/
+;; 
+M107 ;turn off fan
+G28 X0 Y0 Z0 ; home X, Y and Z axis end-stops
+G29 ; initiate z-probing
+G0 X0 Y0 F9000 ; Go to front
+G0 Z0.15 ; Drop to bed
+G92 E0 ; zero the extruded length
+G1 X40 E25 F500 ; Extrude 25mm of filament in a 4cm line
+G92 E0 ; zero the extruded length
+G1 E-1 F500 ; Retract a little
+G1 X80 F4000 ; Quickly wipe away from the filament line
+G1 Z0.3 ; Raise and begin printing.

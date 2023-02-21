@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<!-- saved from url=(0074)file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Cura Settings</title>
+<script>
+
+    function initKeyFilter() {
+      var filter = document.getElementById("key_filter");
+      filter.addEventListener("change", function() {
+        var filterValue = filter.value;
+
+        if (filterValue === '') {
+          document.body.classList.add("show_metadata");
+          document.body.classList.remove("hide_metadata");
+        } else {
+          document.body.classList.remove("show_metadata");
+          document.body.classList.add("hide_metadata");
+        }
+
+        var filterRegexp = new RegExp(filterValue, "i");
+
+        var allKeys = document.querySelectorAll("[--data-key]");
+        var i;
+        for (i=0; i<allKeys.length; i++) {
+          var keyTr = allKeys[i];
+          var key = keyTr.getAttribute("--data-key");
+          if (filterRegexp.test(key)) {
+            keyTr.classList.remove("key_hide");
+          } else {
+            keyTr.classList.add("key_hide");
+          }
+        }
+      });
+    }
+    
+
+    function UnselectAll() {
+      document.querySelectorAll(".menu li").forEach(function(li) {
+        var chk = li.querySelector("input");
+			  chk.checked =  !document.getElementById("unselect_all").checked;
+		})
+      toggleColumnVisibility();
+      toggleNullValue();
+	}
+    
+
+    function toggleDifferences() {
+      if(document.getElementById("toggle_differences").checked) {
+        document.getElementById("toggle_nullvalue").checked = false;
+        var visibleColumns = [];
+        document.querySelectorAll(".menu li").forEach(function(li) {
+          var chk = li.querySelector("input");
+          if(chk.checked) {
+            visibleColumns.push(parseInt(chk.id.replace("chk_", "")));
+          }
+        })
+
+        document.querySelectorAll("tr").forEach(function(row, ridx) {
+          if(row.querySelector("th")) return;
+	        var currentValue = null;
+  	      var diff = false;
+          row.querySelectorAll("td").forEach(function(col, cidx) {
+            if(cidx === 0) return;
+            if(!visibleColumns.includes(cidx-1)) return;
+            if(currentValue === null) {
+              currentValue = col.innerText;
+            } else {
+              if(col.innerText != currentValue) {
+                diff = true;
+                return;
+              }
+            }
+          });
+
+          if(diff) {
+            row.classList.remove("hidden");
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+      } else {
+        document.querySelectorAll("tr").forEach(function(row, idx) {
+          row.classList.remove("hidden");
+        });
+      }
+    }
+    
+
+    function toggleNullValue() {
+      if(document.getElementById("toggle_nullvalue").checked) {
+        document.getElementById("toggle_differences").checked = false;
+        var visibleColumns = [];
+        document.querySelectorAll(".menu li").forEach(function(li) {
+          var chk = li.querySelector("input");
+          if(chk.checked) {
+            visibleColumns.push(parseInt(chk.id.replace("chk_", "")));
+          }
+        })
+
+        document.querySelectorAll("tr").forEach(function(row, ridx) {
+          if(row.querySelector("th")) return;
+	        var currentValue = null;
+  	      var diff = false;
+          row.querySelectorAll("td").forEach(function(col, cidx) {
+            if(cidx === 0) return;
+            if(!visibleColumns.includes(cidx-1)) return;
+			  if(col.innerText != '-') {
+				diff = true;
+				return;
+			  }
+          });
+
+          if(diff) {
+            row.classList.remove("hidden");
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+      } else {
+        document.querySelectorAll("tr").forEach(function(row, idx) {
+          row.classList.remove("hidden");
+        });
+      }
+    } 
+    
+
+    function toggleColumnVisibility() {
+      var visibleColumns = [];
+      document.querySelectorAll(".menu li").forEach(function(li) {
+        var chk = li.querySelector("input");
+        if(chk.checked) {
+          visibleColumns.push(parseInt(chk.id.replace("chk_", "")));
+        }
+      });
+
+      document.querySelectorAll("tr").forEach(function(row, ridx) {
+        row.querySelectorAll("th, td").forEach(function(col, cidx) {
+          if(cidx === 0) return;
+          if(visibleColumns.includes(cidx-1)) {
+            col.classList.remove("hidden");
+          } else {
+            col.classList.add("hidden");
+          }
+        });
+      });
+      toggleDifferences();
+    }
+    
+</script>
+<style>
+html {
+  font-family: sans-serif;
+  font-size: 11pt;
+}
+
+a, a:visited {
+  color: #0000ff;
+  text-decoration: none;
+}
+
+ul {
+  padding-left: 1em;
+}
+
+div.menu {
+  position: fixed;
+  padding: 4px;
+  left: 0px;
+  width: 22em;
+  top: 0px;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  background-color: #ffffff;
+  z-index: 100;
+}
+
+div.contents {
+  padding-left: 22em;
+}
+
+table.key_value_table {
+  border-collapse: separate;
+  border: 1px solid #e0e0e0;
+  margin-top: 16px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-spacing: 0px;
+}
+
+table.key_value_table_extruder > thead th {
+  text-align: left;
+  background-color: #428000;
+  color: #ffffff;
+}
+
+table.key_value_table th, table.key_value_table td {
+  padding: 4px;
+}
+
+table.key_value_table > thead th {
+  text-align: left;
+  background-color: #428bca;
+  color: #ffffff;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+table.key_value_table > tbody > tr:nth-child(even) {
+  background-color: #e0e0e0;
+}
+
+table.key_value_table_extruder > tbody > tr:nth-child(even) {
+  background-color: #e0f0f0;
+}
+
+table.key_value_table > tbody > tr.exception {
+  background-color: #e08080;
+}
+
+table.key_value_table td.key {
+  font-weight: bold;
+}
+
+table.key_value_table tr.preformat td.value {
+  white-space: pre;
+}
+
+table.key_value_table tr.preformat td.value_extruder {
+  white-space: pre;
+  background-color: #e0f0f0;
+}
+
+div.container_stack {
+  padding: 8px;
+  border: 2px solid black;
+  border-radius: 8px;
+}
+
+div.container_stack > table.key_value_table > thead th {
+  background-color: #18294D;
+}
+
+div.container_stack_containers {
+  margin: 4px;
+  padding: 4px;
+  border: 1px dotted black;
+  border-radius: 4px;
+}
+
+td.CellWithComment{
+  white-space: pre;
+  font-weight: bold;
+  position:relative;
+}
+
+td.CellWithError{
+  white-space: pre;
+  font-weight: bold;
+  position:relative;
+  background-color: #c92b12;
+}
+
+.CellComment{
+  display:none;
+  position:absolute; 
+  z-index:100;
+  border:1px;
+  background-color:white;
+  border-style:solid;
+  border-width:1px;
+  border-color:blue;
+  padding:3px;
+  color:blue; 
+  top:30px; 
+  left:20px;
+  font-weight: lighter;
+}
+
+td.CellWithComment:hover span.CellComment{
+  display:block;
+}
+
+td.CellWithError:hover span.CellComment{
+  display:block;
+}
+
+tr.key_hide {
+  display: none;
+}
+
+body.hide_metadata tr.metadata {
+  display: none;
+}
+
+ul.property_list {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+span.prop_name {
+  font-weight: bold;
+}
+tr.hidden, td.hidden, th.hidden {
+  display: none;
+}
+</style>
+</head>
+<body onload="initKeyFilter();">
+<div class="menu">
+<h3><a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#Top_page">Profile List fdmprinter</a></h3><ul>
+<li><input type="checkbox" id="chk_0" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999505872">ABM - Bearings</a></li><li><input type="checkbox" id="chk_1" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999503712">ABM Bearings 2</a></li><li><input type="checkbox" id="chk_2" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999506304">Calibration - PETG</a></li><li><input type="checkbox" id="chk_3" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999503280">Calibration - PLA</a></li><li><input type="checkbox" id="chk_4" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999504720">Draft - ABM</a></li><li><input type="checkbox" id="chk_5" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999505584">Extra Fast - ABM</a></li><li><input type="checkbox" id="chk_6" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999507312">Fine - ABM</a></li><li><input type="checkbox" id="chk_7" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2520849767808">Norgurv3</a></li><li><input type="checkbox" id="chk_8" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999503856">Normal - ABM</a></li><li><input type="checkbox" id="chk_9" checked="" onclick="toggleColumnVisibility()"> <a href="file:///C:/Users/andre/AppData/Local/Temp/5-2-1_cura_settings_compare.html#2518999502992">Water Tight</a></li></ul>
+
+    <div class="toggle_differences">
+    <input type="checkbox" id="unselect_all" onclick="UnselectAll()"> Unselect all
+	</div>
+    <br>
+    
+    <div class="key_filter">
+    🔎 filter key: <input type="text" id="key_filter">
+    </div>
+    
+    <br>
+    <div class="toggle_differences">
+    <input type="checkbox" id="toggle_differences" onclick="toggleDifferences()"> Show only differences
+    </div>
+    
+	<div class="toggle_differences">
+    <input type="checkbox" id="toggle_nullvalue" onclick="toggleNullValue()"> Show only valued parameters
+    </div>
+    
+    </div>
+
+<div class="contents">
+<h2 id="Top_page">Profiles</h2>
+<table class="key_value_table"><thead>
+<tr><th>Key</th>
+<th>ABM - Bearings<a id="2518999505872"></a></th>
+<th>ABM Bearings 2<a id="2518999503712"></a></th>
+<th>Calibration - PETG<a id="2518999506304"></a></th>
+<th>Calibration - PLA<a id="2518999503280"></a></th>
+<th>Draft - ABM<a id="2518999504720"></a></th>
+<th>Extra Fast - ABM<a id="2518999505584"></a></th>
+<th>Fine - ABM<a id="2518999507312"></a></th>
+<th>Norgurv3<a id="2520849767808"></a></th>
+<th>Normal - ABM<a id="2518999503856"></a></th>
+<th>Water Tight<a id="2518999502992"></a></th>
+</tr></thead><tbody>
+<tr class="metadata"><td class="key">definition</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td><td class="value">fdmprinter</td></tr>
+<tr class="metadata"><td class="key">quality_type</td><td class="value">draft</td><td class="value">draft</td><td class="value">normal</td><td class="value">normal</td><td class="value">draft</td><td class="value">verydraft</td><td class="value">normal</td><td class="value">normal</td><td class="value">fast</td><td class="value">draft</td></tr>
+<tr class="" --data-key="Enable Acceleration Control"><td class="CellWithComment">🔑 Enable Acceleration Control<span class="CellComment"><h1>Enable Acceleration Control</h1>
+<p>This setting causes Cura to take over control over how fast the print head should accelerate. Just like a car, the print head needs to accelerate in order to change its speed. Normally the printer decides by itself how fast the print head should change direction and speed, but if this is enabled, Cura can decide this instead, which allows you to have different acceleration rates for each feature of a print.</p>
+<p><img src="./Cura Settings_files/velocity_acceleration_jerk.svg" width="190.66666666666666"></p>
+<ul>
+<li>Increasing acceleration causes the print head to reach the desired speed sooner. This will make the print faster, especially when printing small parts, but will also cause more vibrations. These vibrations reduce dimensional accuracy and cause ringing.</li>
+</ul>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">True</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Use Adaptive Layers"><td class="CellWithComment">🔑 Use Adaptive Layers<span class="CellComment"><h1>Use Adaptive Layers</h1>
+<p>Adaptive Layers will adjust the layer thickness of your print locally to optimise printing time and quality based on the model's surface features. The layers will be made thinner where there are shallow slopes, or made thicker where the walls are steep. The purpose of this is to print fast where possible but still print detailed where needed.</p>
+<p><img src="./Cura Settings_files/adaptive_layer_height_enabled.png" width="190.66666666666666"></p>
+<p>The layer height is adjusted such that the horizontal distance between the edges of the layers remains constant. Shallow surfaces cause a big horizontal displacement with a small vertical displacement, so a small vertical displacement is made to keep the horizontal displacement constant. With steep surfaces there is a small horizontal displacement with a large vertical displacement, so a large vertical displacement is made to keep the horizontal displacement constant. As such the topography effect of the layers is kept constant. The maximum distance between two adjacent layers is held at a constant distance of the Threshold setting.</p>
+<p>If the model has both shallow surfaces and steep surfaces at the same height, the layer thickness is taken to be the smaller of the layer thicknesses. This sometimes makes the layer height unnecessarily small because there is a horizontal surface next to it. This can be seen in the screenshot above as well halfway the height of the silo on the left.</p>
+<p>Adaptive Layers is heavily constrained in order to improve printing quality. The layer height is not allowed to deviate more than a specified Step Size. This causes the layer thickness to gradually transition instead of suddenly cutting it in half from one layer to the next.</p>
+<p>Adaptive Layers can considerably reduce the printing time without suffering a loss in print quality, or even while improving quality in some cases. The effect of adjusting the layer thickness is immense. In most cases, the printing time will be greatly reduced, due to using thicker layers where the model is vertical. The topography effect is also reduced because the layers are spaced closer together horizontally.</p>
+<p>However this feature can introduce a number of problems as well.</p>
+<ul>
+<li>With changing the layer height, some other settings typically need to be adjusted as well, such as the nozzle temperature. Adaptive Layers will not automatically adjust those as well. This can make the print sub-optimal for e.g. overhangs that would fare better at a lower printing temperature.</li>
+<li>If the layer height is changed over the entire layer for a small feature somewhere in a small part of the layer, banding will be visible in the rest of the layer.</li>
+<li>Vertical distances are unintentionally adjusted with this as well. This may have a negative effect on the print quality. For instance, the Top Layers setting as truth, and the layers become thinner. This can cause pillowing. Affected settings that may no longer be correct include:<ul>
+<li>Top Thickness</li>
+<li>Bottom Thickness</li>
+<li>Maximum Skin Angle for Expansion</li>
+<li>Gradual Infill Step Height</li>
+<li>Gradual Support Infill Step Height</li>
+<li>Infill Layer Thickness</li>
+<li>Support Infill Layer Thickness</li>
+<li>Support Z Distance</li>
+<li>Support Roof Thickness</li>
+<li>Support Floor Thickness</li>
+<li>Support Overhang Angle</li>
+<li>Support Stair Step Height</li>
+<li>Tower Roof Angle</li>
+<li>Ooze Shield Angle</li>
+<li>Maximum Model Angle</li>
+</ul>
+</li>
+</ul>
+</span></td><td class="value">True</td><td class="value">True</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Build Plate Adhesion Type"><td class="CellWithComment">🔑 Build Plate Adhesion Type<span class="CellComment"><h1>Build Plate Adhesion Types</h1>
+<p>There are three types of build plate adhesion: skirt, brim and raft. You can also easily disable the adhesion types by setting it to None.</p>
+<p><img src="./Cura Settings_files/adhesion_type_skirt.png" width="190.66666666666666">
+<img src="./Cura Settings_files/adhesion_type_brim.png" width="190.66666666666666">
+<img src="./Cura Settings_files/adhesion_type_raft.png" width="190.66666666666666"></p>
+<h2>Skirt</h2>
+<p>A skirt is a single line encircling your print. It will not directly contribute anything to build plate adhesion. However if you don't want to use the other adhesion methods, this method still serves two functions.</p>
+<ul>
+<li>It causes your nozzle to prime before starting the printing of your actual model, to make sure that material is properly flowing.</li>
+<li>It allows you to see whether or not your build plate is properly levelled.</li>
+</ul>
+<h2>Brim</h2>
+<p>A brim is a single layer flat area around the base of your model. Its purpose is to keep the edges of your print down and make the contact area between your print and the build plate bigger.</p>
+<ul>
+<li>The bigger surface area allows your print to stick better to the build plate. This is useful for pretty much any print larger than a few centimetres.</li>
+<li>This brim will also keep the edges of your print down. Materials that shrink a lot when cooling down (like ABS) tend to warp a lot while printing. Having a brim with sufficient width can keep the corners in place, preventing this warping.</li>
+</ul>
+<h2>Raft</h2>
+<p>A raft is a thick plate between the model and the build plate. This raft shields your print from the heat of the build plate. It will also have a lot of surface area to stick to the build plate with. The print gets put on top of this raft, where it may stick much better. Be careful with thin prints though, since it may be hard to remove the raft without damaging the print.</p>
+</span></td><td class="value">'raft'</td><td class="value">'raft'</td><td class="value">'skirt'</td><td class="value">'skirt'</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">'skirt'</td><td class="value">-</td><td class="value">'none'</td></tr>
+<tr class="" --data-key="Enable Jerk Control"><td class="CellWithComment">🔑 Enable Jerk Control<span class="CellComment"><h1>Enable Jerk Control</h1>
+<p>Jerk determines the speed at which the nozzle can go through corners. If jerk control is enabled, Cura will take control of how much jerk to apply during various parts of the print. If it's disabled, the printer firmware will choose a jerk value. The printer's jerk value is typically fairly high as to give more control to the slicer, but it may have more information about its own hardware than Cura has.</p>
+<p><img src="./Cura Settings_files/velocity_acceleration_jerk.svg" width="190.66666666666666"></p>
+<p><strong>Jerk in 3D printing is not the same as jerk in physics.</strong> The term "jerk" was introduced by Marlin. It was designed there as a workaround for the inherent problem in trying to perfectly follow a path. Since the nozzle is not allowed to deviate from the path (in theory), the nozzle would need to decelerate to 0mm/s in every corner. This would ruin your print, because decelerating to 0mm/s would cause a blob in every corner. It is not allowed to make curves to shortcut the corner, nor can it overshoot. Instead, Marlin allows for an instantaneous change in the velocity vector in every corner. The magnitude of this change in the velocity vector is coined "jerk".</p>
+<p>So jerk is the maximum instantaneous change in velocity, applied at every corner of the motion.</p>
+<p>Firmware that is not based on Marlin, such as the Sailfish firmware family, will ignore changes in jerk. This setting will not have any effect then.</p>
+<h2>Example mathematics of jerk</h2>
+<p>As an example, take a very simple print: First move 100mm to the right, then move 100mm down. The printing speed is set to 50mm/s. Acceleration is set to 1000mm/s^2. Jerk is set to 10mm/s. This is what will happen:</p>
+<ol>
+<li>At the start of a print, Marlin takes half of the jerk value to start, so it will theoretically accelerate to 5mm/s instantaneously.</li>
+<li>At an acceleration of 1000mm/s^2, it will take 0.045s to accelerate from 5mm/s to the maximum velocity of 50mm/s. During this time, the nozzle will cover 1.2375mm.</li>
+<li>The nozzle cruises for a while at 50mm/s, the maximum printing velocity.</li>
+<li>Marlin will calculate at which speed the nozzle may go through the corner: The nozzle will make a 90 degree corner, first going to the right, then going downwards. To limit this velocity change, it's going to go into the corner at cos(90/2) <i> (10/2)mm/s going to the right, and exit at cos(90/2) </i> (10/2)mm/s going down. So it'll go through the corner at about 7.07mm/s.</li>
+<li>It will take 0.043s to decelerate from a speed of 50mm/s to 7.07mm/s.</li>
+<li>The corner is made with an instantaneous velocity change. The magnitude of the difference between the vectors [7.07, 0] and [0, 7.07] is exactly 10mm/s, so it can make this corner instantaneously.</li>
+<li>It will take 0.043s to accelerate from 7.07mm/s to 50mm/s.</li>
+<li>The nozzle cruises for a while again at 50mm/s, the maximum printing velocity.</li>
+<li>Towards the end of the print, the nozzle will decelerate from 50mm/s to 0mm/s in 0.05s.</li>
+</ol>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">True</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Layer Height"><td class="CellWithComment">🔑 Layer Height<span class="CellComment"><h1>Layer Height</h1>
+<p>The 3D printer puts down plastic in layers. The layer height is the thickness of these layers in millimetres. It is the most important factor in both the visual quality of your final print and the printing time.</p>
+<p><img src="./Cura Settings_files/layer_height_0.1.png" width="190.66666666666666">
+<img src="./Cura Settings_files/layer_height_0.3.png" width="190.66666666666666"></p>
+<p>Layer height is the single most important setting to affect the overall quality and conversely the printing time. These are just some of the effects:</p>
+<ul>
+<li>Having thinner layers will increase the visual quality of the print. Since the layers are thinner, the stair stepping effect at the layer's borders will be reduced. Also, the layers will be closer together and so the creases in between the layers will be smaller, leading to an overall smoother finish.</li>
+<li>Having thinner layers allows the printer to produce more detail on the top and bottom sides of your print.</li>
+<li>Having thicker layers tends to make the print stronger, to a point. There will be fewer borders between the layers, which tend to be a weak point. The thicker layers will not shear as much.</li>
+<li>Having thicker layers will reduce printing time, because the nozzle will not have to make as many horizontal movements.</li>
+</ul>
+<h2>Layer height vs. profiles</h2>
+<p>Many settings depend on the layer height. Because layer height significantly affects the flow rate of material through the nozzle, many parameters of the printing process will change. This is very complex. For instance, when increasing the layer height, you should probably increase the printing temperature slightly to offset the extra rate of heat loss. The temperature then affects the liquidity of the material which will affect how sharp your corners will be and what cooling is needed, and so on. It is always wise to start from a pre-made quality profile available to your printer that has a layer height close to what you want.</p>
+<p>You can choose a desired layer height in Custom Mode, but pre-made profiles are available with various layer heights as well. You can choose from profiles for various layer heights in the Recommended Mode using a slider or using the drop-down widget in Custom Mode. Since these profiles also change some parameters that depend on the layer height, you'll probably achieve a better quality that way.</p>
+<h2>Additional notes</h2>
+<p>At very low layer heights, you could run into the resolution limit of your Z axis. Look up the step size of your printer's Z axis and make sure that the layer height is a multiple of this. If it doesn't match up properly, some layers will be thicker than others which will result in banding.</p>
+<p><strong>Note that the layer height setting does not hold for the initial layer of the print or for the raft layers, which have their own settings to adjust the layer height separately. When using adaptive layers, this layer height setting will be used as a baseline but the actual layer height will have some variation.</strong></p>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">0.2</td><td class="value">0.2</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">0.2</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Initial Layer Height"><td class="CellWithComment">🔑 Initial Layer Height<span class="CellComment"><h1>Initial Layer Height</h1>
+<p>This setting defines the thickness of the first layer of your print. The initial layer is normally printed thicker than the rest in order to create a stronger adhesion with the build plate. With this setting, the initial layer's thickness can be increased without reducing the resolution of the rest of the print.</p>
+<p><img src="./Cura Settings_files/layer_height_0.png" width="190.66666666666666"></p>
+<p>Increasing the initial layer's thickness causes the nozzle to extrude more material over the same distance. This takes extra force, as the material spreads out to the sides to fill the full line width. This extra force causes the material to stick better to the build plate. Additionally, the thicker layer will catch any irregularities in the flatness of the surface. If the build plate is slightly bent, the variability will be absorbed by the thickness of the first layer, whereas otherwise the nozzle could scrape it off in the second layer.</p>
+<p>Having too thick of an initial layer causes the first layer to sag more, which causes elephant's feet. The Initial Layer Horizontal Expansion setting can prevent this by giving it a small negative value.</p>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">0.3</td><td class="value">0.3</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">0.3</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Spiralize Outer Contour"><td class="CellWithComment">🔑 Spiralize Outer Contour<span class="CellComment"><h1>Spiralize Outer Contour</h1>
+<p>Spiralize Outer Contour is a trick.</p>
+<p>When printing layer by layer, the nozzle normally needs to move from one layer to the next. This movement causes the nozzle to stand almost still for a fraction of a second, which leaves a seam on the surface called the Z seam. This setting is meant to prevent that and more. It greatly simplifies the printing process by leaving out many aspects of it.</p>
+<p>When spiralising the model, the model will not get any infill or any tops. It will only get one wall and a bottom. Crucially, if Smooth Spiralized Contours is enabled, height of the nozzle will gradually be increased over the course of a layer. This way a spiral is created following the contour of the model. There will be no movement moving from one layer to another, because the nozzle has already gradually moved towards the next layer.</p>
+<p>Spiralize mode is common among many slicers. It is also known as "vase mode" sometimes, because it is a good way to print vases. Some other properties include:</p>
+<ul>
+<li>Prints extremely fast.</li>
+<li>The surface becomes very smooth. There is no Smooth Spiralized Contours is enabled.</li>
+<li>It will not be very strong. If the model is too big, it tends to split due to the thin wall.</li>
+<li>While removing the seam helps to make the print watertight, it is difficult to get the print to be water tight if it has any size. For that, it's advisable to have at least 2 walls. Spiralizing the outer contour is impossible then.</li>
+</ul>
+<p><strong>Spiralize will not work well with prints with many horizontal surfaces. It doesn't handle overhangs at all, and doesn't print top surfaces so nothing will be able to lean on a horizontal surface. It also doesn't work well when there are multiple parts on a layer.</strong></p>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">True</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Build Plate Temperature"><td class="CellWithComment">🔑 Build Plate Temperature<span class="CellComment"><h1>Build Plate Temperature</h1>
+<p>Some printers have a heated build plate. This setting determines how warm the build plate will become.</p>
+<p>Heating the build plate will keep the material slightly fluid and sticky. Some materials will form crystals upon freezing, which causes the material to shrink significantly upon freezing. The heated bed keeps the material just above freezing temperature to prevent this shrinkage and to maintain the stickiness of the liquid plastic. This is all meant to improve the adhesion of the print to the build plate.</p>
+<p>However if the build plate is kept too hot, the print will be very fluid where it touches the build plate. This causes the material to sag a bit, causing warping when the higher up material starts to shrink.</p>
+<p>If this setting is set to 0 degrees, Cura will not output any commands to change the build plate's temperature, which could confuse the firmware if there is no build plate.</p>
+<p><strong>When you adjust the build plate temperature in a material profile, this will adjust the Default Build Plate Temperature setting. Normally the Build Plate Temperature will be equal to the Default Build Plate temperature, but sometimes choosing a different quality can make slight adjustments to the build plate temperature. This Build Plate Temperature setting is the one that actually gets used for the print.</strong></p>
+</span></td><td class="value">60.0</td><td class="value">60.0</td><td class="value">80.0</td><td class="value">60.0</td><td class="value">60.0</td><td class="value">-</td><td class="value">-</td><td class="value">60</td><td class="value">-</td><td class="value">60.0</td></tr>
+<tr class="" --data-key="Enable Linear Advance"><td class="CellWithComment">🔑 Enable Linear Advance<span class="CellComment">Enables adjusting the linear advance factors in the g-code.</span></td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">True</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">True</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Combing Mode"><td class="CellWithComment">🔑 Combing Mode<span class="CellComment"><h1>Combing Mode</h1>
+<p>Combing is the practice of avoiding crossing the walls of the print when travelling from one place to another. Crossing the walls tends to leave a scar on the surface where a hot nozzle exited or entered the volume of the print, so that is generally undesirable.</p>
+<p>Combing alone just causes the nozzle to avoid the walls when travelling through the inside of the mesh. However it also allows for the Avoid Printed Parts While Traveling feature, which makes the nozzle avoid objects while outside of the volume as well.</p>
+<p><img src="./Cura Settings_files/retraction_combing_off.png" width="190.66666666666666">
+<img src="./Cura Settings_files/retraction_combing_on.png" width="190.66666666666666"></p>
+<p>If there is a path through the object from the start to the end location without hitting any walls, this path will be taken without making a retraction. If the start and end location are in completely separate paths, the nozzle will first move to the position where the two parts are closest together, then optionally retract (if Avoid Printed Parts While Traveling setting is enabled.</p>
+<p>The objective of combing is to avoid going through the walls of the object, reducing the amount of scars in the surface. It will also reduce the stringing that is visible on the outside, because while the travel move is made it will still ooze, but this ooze is placed on the inside of the model. However combing will also increase the length of the travel move. Sometimes it needs to make a big detour.</p>
+<p>These are the options in the drop-down for this setting:</p>
+<ul>
+<li><strong>Off</strong>: Combing is disabled. Travel moves will always go directly to their target location. If this happens to not hit any walls, it will not retract.</li>
+<li><strong>All</strong>: The nozzle will not hit any walls while travelling through the inside of the print, as described above.</li>
+<li><strong>Not on Outer Surface</strong>: Aside from going around walls, the nozzle will avoid the highest and lowest layer of skin as well. These are the visible layers where you might see a scar on the surface if the nozzle were to pass over them. If it's not possible to avoid the surface, a retraction will be made.</li>
+<li><p><strong>Not in Skin</strong>: The nozzle will avoid hitting any skin, if possible. While this option is still available from older Cura versions, it causes unnecessary retractions and longer travel paths compared to Not on Outer Surface, because it avoids skin layers even though the scar wouldn't be visible on the outside.</p>
+</li>
+<li><p><strong>Within Infill</strong>: The strictest mode of them all, this only allows combing through the infill. This makes it avoid hitting the inner walls as well as the outer walls, and also avoids hitting the skin. If the nozzle hits the inner walls, it may sometimes still be visible on the outside because the outside radius of the nozzle may be wider than the walls. This prevents that effect. However, it will need to make even more retractions because a path will often not be available.</p>
+</li>
+</ul>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">'no_outer_surfaces'</td><td class="value">'no_outer_surfaces'</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">'no_outer_surfaces'</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Generate Support"><td class="CellWithComment">🔑 Generate Support<span class="CellComment"><h1>Generate Support</h1>
+<p>3D printers with fused-filament fabrication work by placing a string of molten plastic in the correct locations. If this plastic is not supported, it will sag down, because it gets pushed out the nozzle with significant force and because of gravity. Unless the model is beneath it to support the new layer, it will need to be supported by an additional support structure, that is removed and discarded after printing the model.</p>
+<p>This setting enables creating support structures to support the object while it's being printed. Cura won't enable this support by default, but it will mark the surface of the model red if it thinks that the material there could sag a lot if support is not enabled.</p>
+<p><img src="./Cura Settings_files/support_enable_prepare_mode.png" width="190.66666666666666">
+<img src="./Cura Settings_files/support_enable.png" width="190.66666666666666"></p>
+<p>Printing support takes a significant amount of time and material. Where the support touches the model it needs to be broken or cut off later, after the print has completed. This tends to leave a scar on the surface.</p>
+<p>However support is sometimes completely necessary. For instance, if the model has a piece that points down towards the build plate, this piece would otherwise just hang in mid-air.</p>
+<h2>Design for preventing support</h2>
+<p>While it is sometimes necessary, printing support should be prevented if at all possible. There are numerous techniques to prevent having to print support. This is a large part of model design for 3D printing. Here are a couple of techniques by which your 3D model can be altered to prevent needing support.</p>
+<ul>
+<li>Orient your model such that there are no flat surfaces higher than the build plate.</li>
+<li>Avoid designing overhangs as much as possible.</li>
+<li>If there is a surface just above your build plate, pull it down to the build plate.</li>
+<li>Small ledges can be supported with a 45 degree angle slope, transferring the overhang into the model.</li>
+<li>Larger overhangs can be bridged if they are supported on both sides. Cura will automatically orient the lines of the bottom side of that overhang such that they go in a straight line over the bridge. During the printing of these lines, the nozzle will keep tension on the bead such that it doesn't droop down. This then gives it enough time to solidify so that it can hold up on its own.</li>
+<li>If there is a gap in the overhang, a sacrificial bridge can be designed in. This is one layer in which the gap is closed. This allows for good bridging, such that the second layer can build the proper walls of the gap on top. After printing, the gap can be opened with a knife, since it's only one layer thick.</li>
+</ul>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">False</td><td class="value">False</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">False</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Support Structure"><td class="CellWithComment">🔑 Support Structure<span class="CellComment"><h1>Support Structure</h1>
+<p>With this setting you can choose which algorithm to use to construct the support structures. These constructions have vastly different properties, so choosing an algorithm will have a big influence in how well your print gets supported. There are two options available.</p>
+<h2>Normal</h2>
+<p><img src="./Cura Settings_files/support_type_everywhere.png" width="190.66666666666666"></p>
+<p>This is a traditional support structure, the one that most people are used to. The structure is generated underneath the overhanging areas, and typically filled with a pattern that directly supports the overhanging areas. From there it is dropped straight down until it reaches the build plate or a part of the model that supports it.</p>
+<p>The normal support construction has been the default for most of 3D printing history, and works similarly in all slicers. This is the golden standard, and not without reason:</p>
+<ul>
+<li>Due to its sturdy structure, with big contact areas on the model and build plate, it is very reliable. It is very forgiving with bad settings or a badly tuned printer.</li>
+<li>Because the shape is simple, it is quick to slice.</li>
+<li>The straight support structure is easy to customise for a user, since it's immediately clear which borders are going to be supported and which are not.</li>
+</ul>
+<p>The most important downsides arise from the same properties:</p>
+<ul>
+<li>Due to the large contact areas, the support is often hard to remove and can leave significant scars on the surface where it touched.</li>
+<li>Although it is stable, it can use a lot of material and take a lot of time to print. This can be counteracted to an extent by using conical support.</li>
+</ul>
+<p>Since the support will usually be large and wide, an outline to make the support extra sturdy instead.</p>
+<h2>Tree</h2>
+<p><img src="./Cura Settings_files/support_structure_tree.png" width="190.66666666666666"></p>
+<p>With tree support, the support structure will start out small on the build plate, and will grow branches towards the parts of the print that need supporting.</p>
+<p>Tree support can avoid obstacles when growing towards the overhang areas, since the support doesn't need to drop straight down. If at all possible, the support will rest only on the build plate, to prevent scarring of the surface that the support rests on. If no path exists from the build plate to the overhang, it will rest on a surface that is as close to the overhang as possible, to minimise material usage. The branches of tree support are limited by the Tree Support Branch Angle so that they don't produce too steep an overhang themselves. This limits the ability to grow around obstacles and also determines the height at which trunks will start branching out.</p>
+<p>The tree support construction has a number of big advantages over normal support:</p>
+<ul>
+<li>Tree support often uses way less material than ordinary support. Between 25% and 50% of the material usage is common. This saves a lot of time and reduces the cost of the print.</li>
+<li>Because of its small contact area, overhang tends to look better when using tree support.</li>
+<li>Also because of the small contact area, the support will be easier to remove.</li>
+<li>It leaves fewer scars on the surface than normal support, due to being able to reach around the model from the build plate towards the overhang.</li>
+</ul>
+<p>The main disadvantages are however:</p>
+<ul>
+<li>It takes significantly longer to slice than normal support. Patience will be necessary, especially with tall models.</li>
+<li>There are lots of interruptions in the flow when the smallest branches are printed, making tree support unsuitable to print using materials that are hard to extrude, such as PVA or flexible materials.</li>
+<li>Tree support doesn't work well to support some mechanical models. In particular, it tends to place too few branches to support flat, sloped overhangs.</li>
+</ul>
+<p>Tree support is hollow by default. The branches will have a small tip, so an infill pattern doesn't provide extra support for the overhanging surface of the printed item. Due to its jagged shape, the tree support is normally quite sturdy. However the ordinary support settings still apply to the area circumscribed by the tree's branches. The Support Density can be used to give the support more structural strength.</p>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">'tree'</td><td class="value">'tree'</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">'tree'</td><td class="value">-</td><td class="value">-</td></tr>
+<tr class="" --data-key="Support Placement"><td class="CellWithComment">🔑 Support Placement<span class="CellComment"><h1>Support Placement</h1>
+<p>This setting allows you to choose what support can be placed on top of.</p>
+<p><img src="./Cura Settings_files/support_type_everywhere.png" width="190.66666666666666">
+<img src="./Cura Settings_files/support_type_touching_buildplate.png" width="190.66666666666666"></p>
+<p>Placing support everywhere is more reliable for the support. All overhangs that would sag are supported properly. However, the support may rest on top of the model as well, leaving a scar where it touches. This reduces the visual quality and the smoothness of the model's surface after the support is removed.</p>
+<p>Instead, placing support only if it touches the build plate prevents support from resting on the model. This may leave some parts of your model unsupported, though.</p>
+<p><strong>As a trick when using support on the build plate only, try Conical Support Angle a negative value. This allows the support to grow around the model and still support most of the mesh without resting on the model. Alternatively, try tree support.</strong></p>
+</span></td><td class="value">-</td><td class="value">-</td><td class="value">'buildplate'</td><td class="value">'buildplate'</td><td class="value">-</td><td class="value">-</td><td class="value">-</td><td class="value">'buildplate'</td><td class="value">-</td><td class="value">-</td></tr>
+</tbody><thead><tr><th>Extruder N° 0</th>
+<th>ABM - Bearings</th>
+<th>ABM Bearings 2</th>
+<th>Calibration - PETG</th>
+<th>Calibration - PLA</th>
+<th>Draft - ABM</th>
+<th>Extra Fast - ABM</th>
+<th>Fine - ABM</th>
+<th>Norgurv3</th>
+<th>Normal - ABM</th>
+<th>Water Tight</th>
+</tr></thead><tbody>
+<tr class="" --data-key="Print Acceleration"><td class="CellWithComment">🔑 Print Acceleration<span class="CellComment"><h1>Print Acceleration</h1>
+<p>How fast the print head can accelerate towards the desired velocity when starting, stopping or changing direction. Just like a car, the print head needs to accelerate in order to change its speed or direction.</p>
+<p><img src="./Cura Settings_files/velocity_acceleration_jerk.svg" width="190.66666666666666"></p>
+<p>Increasing acceleration causes the print head to reach the desired speed and direction sooner. This will make the print faster, especially when printing small parts, but will also cause more vibrations. These vibrations reduce dimensional accuracy and cause ringing.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">1000</td><td class="value_extruder">1000</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">1000</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Travel Acceleration"><td class="CellWithComment">🔑 Travel Acceleration<span class="CellComment"><h1>Travel Acceleration</h1>
+<p>This setting controls how fast the nozzle accelerates into different directions while travelling across the build volume. The acceleration during travelling can be set to a different rate than while material is extruded.</p>
+<p>Travel moves are often extremely fast and can be quite long, straight lines. This allows the nozzle to reach great speeds and this makes acceleration a big factor in the printing time. Since the printer is not extruding any material during these moves, any vibrations of the printer don't have any real effect on the print. As a result, the travel acceleration should be set pretty high to save on printing time.</p>
+<p>Setting the acceleration too high can cause the motors to lose some steps, which can cause layer shifts to appear.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">1500</td><td class="value_extruder">1500</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">1500</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Bottom Layers"><td class="CellWithComment">🔑 Bottom Layers<span class="CellComment"><h1>Bottom Layers</h1>
+<p>With this setting you can set the number of solid bottom layers of the print. A higher value ensures all gaps on the bottom layers are closed completely. However, this can also increase the print time and amount of filament used.</p>
+<p><img src="./Cura Settings_files/top_bottom_thickness_0.8.png" width="190.66666666666666">
+<img src="./Cura Settings_files/bottom_thickness.png" width="190.66666666666666"></p>
+<ul>
+<li>Increase to improve strength.</li>
+<li>Increase to close gaps on the bottom side of your print.</li>
+<li>Reduce to shorten printing time and material usage.</li>
+</ul>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=999999 if infill_sparse_density == 100 else math.ceil(round(bottom_thickness / resolveOrValue('layer_height'), 4))</td><td class="value_extruder">=999999 if infill_sparse_density == 100 else math.ceil(round(bottom_thickness / resolveOrValue('layer_height'), 4))</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=999999 if infill_sparse_density == 100 else math.ceil(round(bottom_thickness / resolveOrValue('layer_height'), 4))</td><td class="value_extruder">-</td><td class="value_extruder">5</td></tr>
+<tr class="" --data-key="Fan Speed"><td class="CellWithComment">🔑 Fan Speed<span class="CellComment"><h1>Fan Speed</h1>
+<p>The speed at which the fans on the print head will spin throughout most of the print. This is a percentage of the maximum capabilities of the fans.</p>
+<p><img src="./Cura Settings_files/cool_fan_speed.svg" width="190.66666666666666"></p>
+<ul>
+<li>A greater speed allows better cooling. This reduces oozing and stringing.</li>
+<li>A greater speed will produce better overhangs and reduces the pillowing effect.</li>
+<li>A lower speed will reduce warping with some materials and will make the print stronger.</li>
+</ul>
+<p>The fan speed should almost always be maximum when printing materials with a low glass transition temperature range, such as PLA. These materials have virtually no downsides to cooling quickly, since the heat of the nozzle easily keeps the temperature above the glass transition range.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">30.0</td><td class="value_extruder">80.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=100.0 if cool_fan_enabled else 0.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Maximum Fan Speed"><td class="CellWithComment">🔑 Maximum Fan Speed<span class="CellComment"><h1>Maximum Fan Speed</h1>
+<p>The speed at which the fans in the print head will spin when the layer is printed at minimum layer time. At the minimum layer time, you'll want to cool down the layer as fast as possible to reduce the time it takes for the layer to cool down before your printer puts the next layer on top.</p>
+<p><img src="./Cura Settings_files/cool_fan_speed.svg" width="190.66666666666666"></p>
+<p>If printing a layer takes somewhere between the Maximum Fan Speed. Once the Minimum Layer Time is reached, the Maximum Fan Speed will also be reached. This way the print will be cooled maximally to cool it down as quickly as possible before the next layer gets put on top.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=cool_fan_speed</td><td class="value_extruder">=cool_fan_speed</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=cool_fan_speed</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Minimum Layer Time"><td class="CellWithComment">🔑 Minimum Layer Time<span class="CellComment"><h1>Minimum Layer Time</h1>
+<p>The Minimum Layer Time configures the shortest duration of printing a layer that is allowed. The printer is not allowed to print layers any faster than this.</p>
+<p>This is necessary in order to allow the previous layer to cool down before the next layer gets put on top of it. This ensures that the previous layer has completely solidified, to prevent sagging.</p>
+<p><img src="./Cura Settings_files/cool_fan_speed.svg" width="190.66666666666666"></p>
+<p>This setting has three effects:</p>
+<ul>
+<li>If a layer prints faster than the Maximum Fan Speed. Once a layer is so small that it takes down to the Minimum Layer Time to print, the Maximum Fan Speed will be used. The fan speed is interpolated between the two.</li>
+<li>If the layer would take less than the Minimum Layer Time to print, the printing speed will be slowed down such that it still takes the Minimum Layer Time.</li>
+<li>If the print head would be slowed down too much (printing slower than the Minimum Speed setting) then the print head will wait at the end of a layer and optionally lift the head up a bit.</li>
+</ul>
+<p>There is a trade-off when slowing down the nozzle to allow the layer to cool down better. The Minimum Layer Time is intended to give some time for the material to cool down by slowing down the movement of the print head. During this time, the fans will be blowing at maximum power to cool it down more quickly, but the hot nozzle is also still on the plastic. For very small pieces, the hot nozzle may transfer more heat into the print than what the fans can blow off. This causes the plastic to melt even more than if you were to have no minimum layer time.</p>
+<p>When printing relatively cold materials or if the fans on the print head are particularly powerful, the material will tolerate a higher Minimum Layer Time to reduce sagging. If the Minimum Layer Time is set too high, the nozzle will slow down more and more often, which causes blobs and sagging in some places too.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.0</td><td class="value_extruder">0.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Regular/Maximum Fan Speed Threshold"><td class="CellWithComment">🔑 Regular/Maximum Fan Speed Threshold<span class="CellComment"><h1>Regular/Maximum Fan Speed Threshold</h1>
+<p>This setting determines the printing time of the layer at which it is so short that the fan speed will start increasing towards the Minimum Layer Time where the fan speed will be at the Maximum Fan Speed.</p>
+<p><img src="./Cura Settings_files/cool_fan_speed.svg" width="190.66666666666666"></p>
+<p>Effectively, reducing this threshold (towards shorter layers) will cause the fan to spin at the regular fan speed more often. Increasing this threshold will cause the fan to spin at greater speeds more often, even if the layers aren't very small.</p>
+<p>It is good to keep some distance between the Minimum Layer Time and this Regular/Maximum Fan Speed Threshold. If the threshold is set to be at the Minimum Layer Time, the fan will abruptly stop if the layers become slightly below the threshold. This causes visible banding across the surface of the print, since there is a hard border where the fan suddenly flared up. If instead there is some difference between the two settings, the change in fan speed will be more gradual and the banding won't be visible in the print.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">10.0</td><td class="value_extruder">10.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">10.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Infill Before Walls"><td class="CellWithComment">🔑 Infill Before Walls<span class="CellComment"><h1>Infill Before Walls</h1>
+<p>This affects the order in which things are printed. With this setting enabled, the infill of a part will be printed before the walls of that part on that layer are printed.</p>
+<p><img src="./Cura Settings_files/infill_before_walls_disabled.gif" width="190.66666666666666">
+<img src="./Cura Settings_files/infill_before_walls_enabled.gif" width="190.66666666666666"></p>
+<p>This setting is a trade-off between accuracy and strength:</p>
+<ul>
+<li>If the walls are printed before the infill, the walls could have nothing to attach to, causing them to sag more. However, the walls will have solidified first and won't be pushed away by the infill, which prevents the infill from shining through the walls.</li>
+<li>If the infill is printed before the walls, the walls will get pushed away where infill is attached to the walls, which makes the walls less accurate and can cause the infill to shine through the surface, creating a pattern visible on the outside. However the infill will hold the walls in place better while they are printed.</li>
+</ul>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">False</td><td class="value_extruder">False</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">False</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Infill Pattern"><td class="CellWithComment">🔑 Infill Pattern<span class="CellComment"><h1>Infill Pattern</h1>
+<p>The infill pattern defines a structure that is used to fill the volume of the object. Various patterns are available, each of which has their own advantages. Some are specialised for very specific applications.</p>
+<h2>Grid</h2>
+<p><img src="./Cura Settings_files/infill_pattern_grid.png" width="190.66666666666666"></p>
+<p>The grid infill pattern creates two perpendicular sets of lines. Together this forms a pattern of squares.</p>
+<ul>
+<li>Strongest pattern in the vertical direction.</li>
+<li>Fairly strong in the two directions of the lines.</li>
+<li>Not so strong in the diagonal.</li>
+<li>Very good at supporting the top surface. Your surface will look very smooth.</li>
+</ul>
+<h2>Lines</h2>
+<p><img src="./Cura Settings_files/infill_pattern_lines.png" width="190.66666666666666"></p>
+<p>The lines pattern creates parallel lines. By default, the lines pattern alternates its direction perpendicularly from layer to layer, which makes it look like the grid pattern at first glance. However this can be altered with the Infill Line Directions setting.</p>
+<ul>
+<li>Tends to be weak in the vertical direction, because the layers only have small points in which they bond together.</li>
+<li>Will be extremely weak in the horizontal direction, except in the one direction that the lines are oriented. But even in that direction, it is not resistant to shear so it will fail fairly quickly under load.</li>
+</ul>
+<h2>Triangles</h2>
+<p><img src="./Cura Settings_files/infill_pattern_triangles.png" width="190.66666666666666"></p>
+<p>The triangles pattern creates three sets of lines in three different directions. Together this forms a pattern of triangles.</p>
+<ul>
+<li>Very resistant to shear.</li>
+<li>Approximately equal strength in every horizontal direction.</li>
+<li>Top lines have to bridge fairly long, requiring many top skin layers to get an even top surface.</li>
+<li>Flow gets significantly interrupted at intersections, resulting in relatively low strength at high infill rates.</li>
+</ul>
+<h2>Tri-hexagon</h2>
+<p><img src="./Cura Settings_files/infill_pattern_trihexagon.png" width="190.66666666666666"></p>
+<p>The tri-hexagon pattern creates three sets of lines in three different directions, just like the triangles pattern, but offset from each other so that they don't all intersect in the same position.</p>
+<ul>
+<li>Strongest pattern in the horizontal direction.</li>
+<li>Approximately equal strength in every horizontal direction.</li>
+<li>Very resistant to shear.</li>
+<li>Top lines have to bridge very long, requiring many top skin layers to get an even top surface.</li>
+</ul>
+<h2>Cubic</h2>
+<p><img src="./Cura Settings_files/infill_pattern_cubic.png" width="190.66666666666666"></p>
+<p>The cubic pattern creates cubes, a 3-dimensional pattern. The cubes are oriented standing on a corner, which allows printing them without overhanging internal surfaces.</p>
+<ul>
+<li>Approximately equal strength in every direction, including the vertical direction.</li>
+<li>Fairly strong in every direction.</li>
+<li>Reduced effect of pillowing, since it doesn't produce long vertical pockets of hot air.</li>
+</ul>
+<h2>Cubic Subdivision</h2>
+<p><img src="./Cura Settings_files/infill_pattern_cubic_subdivision.png" width="190.66666666666666"></p>
+<p>The cubic subdivision pattern creates cubes, a 3-dimensional pattern. The cubes are oriented standing on a corner, which allows printing them without overhanging internal surfaces. However this pattern will produce bigger cubes towards the inside of the volume, which saves on material. It leaves out the infill lines in places where they are least useful.</p>
+<p>This pattern may produce infill densities that are lower than desired. It is advisable to increase the infill density drastically when using this pattern. The optimisation works best at high infill rates.</p>
+<p>Algorithmically, this pattern is generated by creating one giant cube around the entire volume, then subdividing this cube into 8 sub-cubes when it hits any walls. This is then recursed, so the sub-cubes that hit any walls are subdivided again and again. This repeats until the infill line distance is reached.</p>
+<ul>
+<li>Strongest pattern by weight and printing time.</li>
+<li>Approximately equal strength in every direction, including the vertical direction.</li>
+<li>Concentrates infill in thin pieces.</li>
+<li>Reduced effect of pillowing, since it doesn't produce long vertical pockets of hot air.</li>
+<li>If using increased infill density, the infill doesn't shine through walls much, producing a better surface quality for equal printing time.</li>
+<li>Introduces retractions, which doesn't work well with flexible or runny materials.</li>
+<li>Takes longer to slice.</li>
+</ul>
+<h2>Octet</h2>
+<p><img src="./Cura Settings_files/infill_pattern_octet.png" width="190.66666666666666"></p>
+<p>The octet pattern creates a combination of regular tetrahedra and cubes, a 3-dimensional pattern. Every so often, multiple infill lines will be placed adjacent to each other.</p>
+<ul>
+<li>Creates a strong internal frame where multiple parallel lines touch. Load is quickly dissipated towards this internal frame.</li>
+<li>Strong on models with a medium thickness of about a centimetre.</li>
+<li>Reduced effect of pillowing, since it doesn't produce long vertical pockets of hot air.</li>
+<li>Results in a very long bridging distance for top skin, which reduces top surface quality.</li>
+</ul>
+<h2>Quarter Cubic</h2>
+<p><img src="./Cura Settings_files/infill_pattern_quarter_cubic.png" width="190.66666666666666"></p>
+<p>The quarter cubic pattern creates a 3-dimensional tesselation consisting of tetrahedra and truncated tetrahedra. Every so often, multiple infill lines will be placed adjacent to each other.</p>
+<ul>
+<li>Creates two disjunct internal frames, similar to octet, where multiple parallel lines touch. Load is quickly dissipated towards this internal frame. The frames are oriented in two different directions, making them weaker individually but reducing the distance to distribute the load to these frames.</li>
+<li>Strong on models with a low thickness of a few millimetres.</li>
+<li>Reduced effect of pillowing, since it doesn't produce long vertical pockets of hot air.</li>
+<li>Results in a very long bridging distance for top skin, which reduces top surface quality.</li>
+</ul>
+<h2>Concentric</h2>
+<p><img src="./Cura Settings_files/infill_pattern_concentric.png" width="190.66666666666666"></p>
+<p>The concentric pattern creates rings parallel to the walls.</p>
+<ul>
+<li>The strongest infill pattern when using 100% infill, since not only will no lines intersect, but the lines are also oriented in a way that the non-isotropic strength of lines will distribute the load.</li>
+<li>Produces the most flexible prints, with a very weak and even strength in all horizontal directions.</li>
+<li>Stronger in the vertical direction than in the horizontal direction.</li>
+<li>With 100% infill density, the material could clump up in the middle, reducing reliability of printing round shapes where the concentric circles come together in one point.</li>
+<li>With some shapes, some of the infill lines could hang in mid-air, adding no additional strength for the cost of material and printing time.</li>
+<li>When not using 100% infill, this is the weakest infill pattern in the horizontal direction. It adds no strength at all.</li>
+</ul>
+<h2>Zigzag</h2>
+<p><img src="./Cura Settings_files/infill_pattern_zigzag.png" width="190.66666666666666"></p>
+<p>The zigzag infill pattern causes the nozzle to draw lines in a zig-zag fashion. This is like lines, but the lines are connected in one long line, which prevents flow interruptions.</p>
+<ul>
+<li>The second-strongest infill pattern when using 100% infill. However, it prints more reliably than concentric infill with round shapes.</li>
+<li>The best pattern for a smooth top surface together with zigzag, since the distance between the lines is smallest.</li>
+<li>Tends to be fairly weak in the vertical direction, since the layers only have small points in which they bond together.</li>
+<li>Will be extremely weak in the horizontal direction, except in the one direction that the lines are oriented. But even in that direction, it is not resistant to shear so it will fail fairly quickly under load. </li>
+</ul>
+<h2>Cross</h2>
+<p><img src="./Cura Settings_files/infill_pattern_cross.png" width="190.66666666666666"></p>
+<p>The cross infill pattern produces a space-filling curve that produces something that looks like crosses along the inside of the volume.</p>
+<ul>
+<li>Evenly squishy in all horizontal directions, making this useful for printing soft and flexible objects.</li>
+<li>Produces no long straight lines in the horizontal direction, making this evenly squishy along the entire perimeter. There are no strong spots.</li>
+<li>Produces no retractions at all, making this easier to print with flexible materials.</li>
+<li>Will be stronger in the vertical direction than in the horizontal direction.</li>
+<li>Takes a long time to slice.</li>
+<li>Will be very weak in all horizontal directions.</li>
+</ul>
+<h2>Cross 3D</h2>
+<p><img src="./Cura Settings_files/infill_pattern_cross_3d.png" width="190.66666666666666"></p>
+<p>The cross 3D infill pattern produces a space-filling curve that produces something that looks like crosses along the inside of the volume. This pattern pulses along the Z axis in order to make it weaker in the vertical direction.</p>
+<ul>
+<li>Approximately evenly squishy in all directions, horizontal and vertical, making this the most useful pattern for printing soft and flexible objects.</li>
+<li>Produces no long straight lines, making this evenly squishy along the entire surface.</li>
+<li>Produces no retractions at all, making this easier to print with flexible materials.</li>
+<li>Takes a long time to slice.</li>
+<li>Will be very weak in all directions. </li>
+</ul>
+<h2>Gyroid</h2>
+<p><img src="./Cura Settings_files/infill_pattern_gyroid.png" width="190.66666666666666"></p>
+<p>The gyroid infill pattern produces a wavy pattern that alternates directions.</p>
+<ul>
+<li>Produces one volume which is completely permeable to fluids, making this a useful pattern for dissolvable materials.</li>
+<li>Equally strong in all directions, but not very stiff. This makes it useful for flexible materials, but the result will be somewhat harder, less squishy, than the Cross (3D) infill patterns.</li>
+<li>There are no overlapping lines in this pattern, which allows printing with materials with higher surface tension more easily and makes the infill very reliable and consistent.</li>
+<li>Resistant to shearing.</li>
+<li>Takes a long time to slice and produces large g-code files. For some printers it may be hard to keep up with the many g-code commands per second, and it may be hard to keep up with over serial connection on low baud rates.</li>
+</ul>
+<h2>Lightning</h2>
+<p><img src="./Cura Settings_files/infill_pattern_lightning.png" width="190.66666666666666">
+<img src="./Cura Settings_files/infill_pattern_lightning_side.png" width="190.66666666666666"></p>
+<p>The lightning infill pattern is a jagged minimal pattern that only aims to support the top surface. The infill density specified will only be reached right underneath the top side of the infill volume.</p>
+<ul>
+<li>Saves a massive amount of time and material by only producing infill underneath the surface.</li>
+<li>Increasing the infill density leads to the best top surface quality of all patterns while not taking any more time and material.</li>
+<li>Prevents infill from shining through the walls in many places, by simply not having infill.</li>
+<li>Does not add to the strength of the part in any significant way.</li>
+</ul>
+</span></td><td class="value_extruder">'lines'</td><td class="value_extruder">'lines'</td><td class="value_extruder">'gyroid'</td><td class="value_extruder">'gyroid'</td><td class="value_extruder">'cubic'</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">'gyroid'</td><td class="value_extruder">'cubic'</td><td class="value_extruder">'cubic'</td></tr>
+<tr class="" --data-key="Infill Density"><td class="CellWithComment">🔑 Infill Density<span class="CellComment"><h1>Infill Density</h1>
+<p>This setting configures the density of the volume inside the print, which is a major factor in the strength of the final print as well as the top surface quality. The greater the infill density, the closer the infill lines will be placed together. You can even go above 100% density, but that will result in overextrusion.</p>
+<p><img src="./Cura Settings_files/infill_pattern_grid.png" width="190.66666666666666">
+<img src="./Cura Settings_files/infill_sparse_density_low.png" width="190.66666666666666"></p>
+<p>Different densities work better with different infill patterns. Infill patterns with lots of corners and lots of crossings will not work well at great infill densities. Corners are a problem because the filament tends to drag along with the corner, creating air pockets in the outside of the corner where the material should've been deposited. Crossings are an even greater problem, because when one line crosses another its flow will get interrupted, causing underextrusion right after the crossing.</p>
+<p>Increasing the infill density (by reducing the line distance) has a big effect on your print, namely:</p>
+<ul>
+<li>Your print will be stronger.</li>
+<li>The top surface will be supported better, making it smoother and more water tight.</li>
+<li>Reduced pillowing because the pockets of heat will be smaller.</li>
+<li>Your print will require more material and as a result will be heavier.</li>
+<li>It takes longer to print.</li>
+</ul>
+</span></td><td class="value_extruder">30.0</td><td class="value_extruder">30.0</td><td class="value_extruder">0</td><td class="value_extruder">0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">10</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Initial Layer Line Width"><td class="CellWithComment">🔑 Initial Layer Line Width<span class="CellComment"><h1>Initial Layer Line Width</h1>
+<p>This makes the lines in the initial layer wider or thinner by a certain ratio.</p>
+<p><img src="./Cura Settings_files/initial_layer_line_width_factor.png" width="190.66666666666666"></p>
+<p>The goal of this setting is to improve adhesion to the build plate. In order to print wider lines, the nozzle has to extrude more material and that material has to flow wider outward. This causes the nozzle to press the material harder on the build plate, which increases adhesion between the filament and the build plate.</p>
+<ul>
+<li>Not only will the lines be wider or thinner, but they will also be farther apart or closer together by the same factor, so it would not produce overextrusion or underextrusion.</li>
+<li>This setting affects all line widths; skin, walls, adhesion, support, the prime tower, and so on. They will be made wider or thinner by the same ratio.</li>
+</ul>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">100</td><td class="value_extruder">100</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">100</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Line Width"><td class="CellWithComment">🔑 Line Width<span class="CellComment"><h1>Line Width</h1>
+<p>This is the horizontal width of the lines that the printer will place down. Normally the diameter of the nozzle opening determines how wide your lines will be, but by extruding more or less material, the printer can vary a little bit in how wide the lines will become.</p>
+<p><img src="./Cura Settings_files/line_width_small.png" width="190.66666666666666">
+<img src="./Cura Settings_files/line_width_large.png" width="190.66666666666666"></p>
+<p>Reducing the line width allows the printer to print more details. In particular it also allows the printer to print thin parts. Line width is one of the most influential settings in your print. Here are some of the effects:</p>
+<ul>
+<li>Printing thinner lines will allow thinner pieces to be printed, since it can even fit a line in the thinnest parts.</li>
+<li>Adjusting the line width to an even multiple of the thickness of your print can make the object stronger and make the material flow better.</li>
+<li>A smaller line width will make your top surface look smoother.</li>
+<li>Printing lines slightly smaller than your nozzle size tends to improve strength. It allows the nozzle to fuse adjacent lines together when it makes a second pass slightly over the previous line.</li>
+<li>Printing lines that are too wide will lead to underextrusion. The printer will attempt to extrude more material, enough to fill the desired width of the line. That material will attempt to flow in whichever direction it can. However at some point the back pressure will become too great such that the material will no longer flow all the way to the side of the very wide lines. This then leaves gaps between the lines.</li>
+<li>Printing lines that are too small will also lead to underextrusion. If the material doesn't flow fast enough through the nozzle, the surface tension of the material will cause it to coagulate into small droplets, making the extrusion uneven and leaving gaps in between the droplets.</li>
+<li>Printing thinner lines will considerably increase the printing time.</li>
+</ul>
+<p>It's not advisable to reduce the line width below 60% of the nozzle size or above 150%. Both may fail to extrude enough material.</p>
+<p>In thin parts, the line width will automatically be adjusted to make it fit the local width of the part there. There is no need to ensure that the part's width is a multiple of the line width. The Minimum Wall Line Width determines how far they can get adjusted in each direction.</p>
+<h2>Keeping the flow constant</h2>
+<p>Great fluctuations in flow are sometimes problematic for FDM printers. The nozzle chamber keeps some material under pressure, which causes the actual flow rate out the nozzle to be delayed. It'll take a while for the flow rate to increase or decrease. Printers with a Bowden system to feed the filament also have springiness in the Bowden tube, which makes the effect much worse. As a result of this, you'll get underextrusion when switching to a higher flow rate and overextrusion when switching to a lower flow rate. Therefore it is a good idea to keep the flow rate as constant as possible.</p>
+<p>Line width influences the flow rate greatly. It is advisable to keep the widths of the lines close together and close to the size of the nozzle. If adjusting the line width significantly, you could consider adjusting the printing speed as well to keep the flow rate more constant. This will improve your print's dimensional accuracy.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.4</td><td class="value_extruder">0.4</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.4</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Final Printing Temperature"><td class="CellWithComment">🔑 Final Printing Temperature<span class="CellComment"><h1>Final Printing Temperature</h1>
+<p>Just before switching to a different extruder, the nozzle will be allowed to cool down slightly to the Final Printing Temperature. In effect, this causes the nozzle to cool down slightly earlier before the extruder has completed printing. It will start cooling down at such a moment that the nozzle is expected to reach the Final Printing Temperature is reached exactly when the extruder switch happens. After that, it will continue cooling down towards the stand-by temperature.</p>
+<p><img src="./Cura Settings_files/temperature_regulation.svg" width="190.66666666666666"></p>
+<p>If the Final Print Temperature temperature is slightly lower than the normal printing temperature, the nozzle won't ooze as much while waiting in stand-by while the other extruder is printing.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=max(-273.15, material_print_temperature - 15)</td><td class="value_extruder">=max(-273.15, material_print_temperature - 15)</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=max(-273.15, material_print_temperature - 15)</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Flow"><td class="CellWithComment">🔑 Flow<span class="CellComment"><h1>Flow</h1>
+<p>Adjusting the flow directly adjusts how much material is placed down. Normally the amount of material is calculated by Cura such that the material would fill the exact space in the line's width, height and length, but this can be adjusted using the flow settings.</p>
+<p>The main use case for adjusting the flow is to compensate for some fault in the extrusion train. For instance, if the nozzle is slightly clogged, this can cause underextrusion. Increasing the flow could then push more material through the clogged nozzle, hopefully causing it to end at the right amount of material. This can also compensate for slip or variance in filament diameter.</p>
+<p>It is almost always better to fix the actual problem causing the overextrusion or underextrusion, but adjusting the flow can be an easy temporary fix.</p>
+<p><strong>If you want the lines to be wider, it is better to adjust the actual line width setting. The line width doesn't necessarily need to be the same as the nozzle size. Adjusting the line width will also adjust the spacing between the lines which prevents overextrusion and underextrusion. Adjusting the flow doesn't adjust spacing.</strong></p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">90.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">105.0</td></tr>
+<tr class="" --data-key="Initial Layer Flow"><td class="CellWithComment">🔑 Initial Layer Flow<span class="CellComment"><h1>Initial Layer Flow</h1>
+<p>Just like the ordinary Flow setting, this setting adjusts the amount of material being pushed through the nozzle, but this one only affects the layer that rests on the build plate.</p>
+<p>Adjusting the flow directly adjusts how much material is placed down. Normally the amount of material is calculated by Cura such that the material would fill the exact space in the line's width, height and length, but this can be adjusted using the flow settings.</p>
+<p>Increasing the flow for the first layer causes the material to be pushed harder onto the build plate. This improves adhesion to the build plate. This setting can also be used to adjust for an improperly levelled bed. If the bed is too close, you'll want to reduce the flow. If the bed is too far, you'll want to increase the flow. It's still better to properly adjust the bed though, if you have that capability.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">100</td><td class="value_extruder">100</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">95.7</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Initial Printing Temperature"><td class="CellWithComment">🔑 Initial Printing Temperature<span class="CellComment"><h1>Initial Printing Temperature</h1>
+<p>After being on stand-by while different extruders have been printing, the nozzle will start at a slightly lower temperature. It then immediately heats up to the ordinary printing temperature once the printing has started.</p>
+<p><img src="./Cura Settings_files/temperature_regulation.svg" width="190.66666666666666"></p>
+<p>Restarting the print at a slightly lower temperature reduces the amount of oozing while the nozzle is standing by. After all, most of the oozing happens while the nozzle is at its highest temperature. Lowering this temperature effectively causes it to start printing at a slightly lower temperature so that this oozing would occur during printing when it's actually desired.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=max(-273.15, material_print_temperature - 10)</td><td class="value_extruder">=max(-273.15, material_print_temperature - 10)</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=max(-273.15, material_print_temperature - 10)</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Linear Advance Factor"><td class="CellWithComment">🔑 Linear Advance Factor<span class="CellComment">Sets the advance extrusion factor for Linear Advance. A value of '0' means no linear advance compensation is applied.</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.4</td><td class="value_extruder">0.4</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.4</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Printing Temperature"><td class="CellWithComment">🔑 Printing Temperature<span class="CellComment"><h1>Printing Temperature</h1>
+<p>This refers to the temperature of the nozzle while printing. The printing temperature is one of the most influential settings, because it affects how the material behaves during printing. Even a small different in temperature can have a large effect on how the plastic flows.</p>
+<p>Every type of filament has a range of temperatures it can be printed at. This will usually be listed on the box it came in and on the technical data sheet. Increasing the temperature generally makes thermoplastics more fluid. This allows the printer to extrude material faster, because the internal friction is lowered. When printing with large layer heights, wide lines, large flow or great speeds, the temperature needs to be towards the higher end of the temperature range. However, hotter printing also makes the material harder to cool, so this causes overhang to sag more (requiring more support) and causes more stringing.</p>
+<p>Setting the temperature too high causes the material to degrade while printing. This can clog your nozzle and potentially damage your printer. Setting the temperature too low causes the feeder to grind on the material, making it stop extruding.</p>
+</span></td><td class="value_extruder">210.0</td><td class="value_extruder">205.0</td><td class="value_extruder">=default_material_print_temperature</td><td class="value_extruder">205.0</td><td class="value_extruder">210.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=default_material_print_temperature</td><td class="value_extruder">210.0</td><td class="value_extruder">225.0</td></tr>
+<tr class="" --data-key="Optimize Wall Printing Order"><td class="CellWithComment">🔑 Optimize Wall Printing Order<span class="CellComment"><h1>Optimize Wall Printing Order</h1>
+<p>If this is enabled, Cura will spend some extra slicing time to optimise the order in which the walls are printed. The goal is to reduce the number of travel moves and retractions by printing walls that surround the same part after one another.</p>
+<p><img src="./Cura Settings_files/optimize_wall_printing_order_disabled.gif" width="190.66666666666666">
+<img src="./Cura Settings_files/optimize_wall_printing_order_enabled.gif" width="190.66666666666666"></p>
+<p>If this optimisation is enabled, the nozzle will print all the walls around one part first before moving to the next part, instead of printing all of the inner walls first before printing the outer walls. Optimising is usually positive, but with some parts it may impact dimensional accuracy because the previous wall hasn't solidified yet when placing down the next one next to it.</p>
+<p>If the inner wall and the outer wall have greatly different flow rates, this optimisation also causes many more changes in flow rate. This manifests itself with a bigger blobs. The line width has a bigger impact on the print than this travel optimisation, so it's better to turn off the optimisation if this could be the problem in your print.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">True</td><td class="value_extruder">True</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">True</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Raft Extra Margin"><td class="CellWithComment">🔑 Raft Extra Margin<span class="CellComment"><h1>Raft Extra Margin</h1>
+<p>This setting makes the raft wider than the model. It indicates the width of the extra border around the model.</p>
+<p><img src="./Cura Settings_files/raft_dimensions.svg" width="190.66666666666666"></p>
+<p>Increasing this setting will greatly improve adhesion between the raft and the build plate. Not only is there a greater area for the raft to stick to the build plate, but the expansions also softens the corners of the raft. With softer corners, warping will have less of an effect on the raft. Secondly, a larger raft allows you to break away the raft from the model more easily, since there is some area to grab the raft with.</p>
+<p>However, increasing the Raft Extra Margin will also take more space on the build plate. It will take more material and time to print the raft.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">2.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Raft Print Speed"><td class="CellWithComment">🔑 Raft Print Speed<span class="CellComment"><h1>Raft Print Speed</h1>
+<p>This setting determines the overall speed at which the raft is printed. The actual speed to print the raft at may still be different if the speed is specialised for the base, middle or top layers.</p>
+<p>Printing the raft more slowly than the rest of the print is generally beneficial. Printing slower allows the plastic to anneal more because it stays hot for longer, which reduces the internal stresses within the lines and reduces warping. Because it stays hot for longer, the material can also flow out more, increasing the contact area with the bed which improves adhesion. In general, your raft will be stiffer, stronger, more reliable and stick better.</p>
+<p>However it will of course take more time to print the raft then.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">40.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Retraction Distance"><td class="CellWithComment">🔑 Retraction Distance<span class="CellComment"><h1>Retraction Distance</h1>
+<p>This is the distance, in millimetres, that the material is retracted from the nozzle tip, when a retraction is made.</p>
+<p>The setting has numerous effects in all sorts of ways.</p>
+<ul>
+<li>Retracting the material produces an underpressure inside the nozzle chamber, which pulls the material back inside the nozzle opening. Retracting the material farther increases this underpressure, so that it works for denser materials.</li>
+<li>When making long travel moves, the retracted material still has some time to melt in the nozzle chamber. Retracting the material farther makes it take a longer time for this molten material to drip out, preventing stringing.</li>
+<li>Retractions wear down the material where the feeder grips them. Longer retractions wear down more of the material. This may cause the feeder to lose grip, which would cause the printer to stop extruding altogether.</li>
+<li>Longer retractions take more time than shorter ones.</li>
+<li>Retractions that are made on the surface of the model will cause a bigger blob while the material is being retracted, because the nozzle pauses for a longer time while the material is being retracted.</li>
+</ul>
+<p>If the feeder is very far removed from the nozzle (such as in a printer with a Bowden tube), then retracting the material typically has no effect at all unless the retracted distance is very large. Instead of retracting the material from the nozzle, some of the play in the filament is pulled in. The pressure on the nozzle is then reduced, but it will keep oozing material. This is why printers with a Bowden tube tend to require much greater retraction distances.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">3</td><td class="value_extruder">3</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">3</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Z Hop Height"><td class="CellWithComment">🔑 Z Hop Height<span class="CellComment"><h1>Z Hop Height</h1>
+<p>If a Z hop is performed, this setting determines how high the nozzle will move up before travelling to the destination.</p>
+<p><img src="./Cura Settings_files/retraction_hop_enabled.svg" width="190.66666666666666"></p>
+<p>Because Z-speed is up to 2 orders of magnitude slower than X/Y-speeds, Z hops can be time consuming.</p>
+<p>Higher Z hops take more time to do, which can significantly increase the total printing time and slightly increases the amount of oozing as well,
+However passing too low over the surface allows the ooze out of the nozzle to hit the model anyway, defeating the purpose of the Z hop.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.3</td><td class="value_extruder">0.3</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">0.3</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Retraction Speed"><td class="CellWithComment">🔑 Retraction Speed<span class="CellComment"><h1>Retraction Speed</h1>
+<p>This is the speed at which the material is pulled out of the nozzle and pushed back in, when making a retraction.</p>
+<p>In general you'll want to set this as high as possible without grinding the material at the feeder. Moving the filament at greater speed makes the nozzle stand still for a shorter amount of time, which reduces the size of the blob in the location where it moves the material and slightly reduces printing time.</p>
+<p>If the speed is set too high however, the force exerted by the feeder will be so high that the feeder wheel will start to grind into the filament. This reduces the reliability of the print.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">55</td><td class="value_extruder">55</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">55</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Skirt/Brim Speed"><td class="CellWithComment">🔑 Skirt/Brim Speed<span class="CellComment"><h1>Skirt/Brim Speed</h1>
+<p>This setting adjusts the speed of the skirt or the brim separately from the rest of the print.</p>
+<p>The skirt or brim is usually printed rather slowly, in order to make it stick better to the build plate. Printing slower (up to a point) generally makes it stick better, but takes more time to print.</p>
+<p>Even though the skirt and brim are printed on the first layer, this setting overrides the Initial Layer Print Speed.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_layer_0</td><td class="value_extruder">=speed_layer_0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_layer_0</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Infill Speed"><td class="CellWithComment">🔑 Infill Speed<span class="CellComment"><h1>Infill Speed</h1>
+<p>The speed at which the infill material is printed can be configured separately from the normal print speed.</p>
+<p><img src="./Cura Settings_files/speed_difference.png" width="190.66666666666666"></p>
+<p>The visual quality of infill is not usually important, so the infill can be printed at a fairly high speed to save time. On the other hand, increasing the infill speed also makes the infill shine through the walls more, because the nozzle will wobble more into the walls.</p>
+<p>There is also the danger of introducing too great of a flow change. Especially when combined with settings like Infill Layer Thickness, the difference in the flow rate required for the infill and the flow rate required for the rest of the print can be very large. There is a large delay when adjusting the flow rate through the nozzle, so if the infill is made too fast compared to the rest, the flow could be inaccurate.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print</td><td class="value_extruder">=speed_print</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Initial Layer Speed"><td class="CellWithComment">🔑 Initial Layer Speed<span class="CellComment"><h1>Initial Layer Speed</h1>
+<p>This setting adjusts the speed at which the bottom layer of the model is printed.</p>
+<p>All of the initial layer will normally be printed with this speed, even though the walls, skin and support can normally be printed at separate speeds. Not so for the initial layer! For the initial layer, the speed of the base layer of the raft is not affected.</p>
+<p>Reducing the initial layer speed will improve the adhesion between the model and the build plate. This is because the material stays hotter for a longer time and can then flow out longer. This reduces the internal stresses in the material and increases the contact area, both of which increase the adhesion.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print * 30 / 60</td><td class="value_extruder">=speed_print * 30 / 60</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print * 30 / 60</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Print Speed"><td class="CellWithComment">🔑 Print Speed<span class="CellComment"><h1>Print Speed</h1>
+<p>This setting adjusts the overall speeds at which the model is printed.</p>
+<p>Since speeds can also be adjusted separately for individual structures of the print, the actual printing speed will still vary. This setting causes the rest of the speeds to adjust by ratio.</p>
+<p><img src="./Cura Settings_files/speed_difference.png" width="190.66666666666666"></p>
+<p>This setting is a great influence on the balance between printed part quality and printing time. Increasing the printing speed will reduce the duration of the print, but will increase vibration of the print head. It will also make it more difficult for the feeder to keep up, making the print more sensitive to overextrusion and underextrusion.</p>
+<p>When increasing the print speed, it is advisable to increase the material temperature as well. This will make the material slightly more runny, which allows it to flow more easily at greater speeds.</p>
+<p><strong>Increasing the printing speed will not have a large effect if the print has many small details. Acceleration and jerk are the bottleneck then.</strong></p>
+</span></td><td class="value_extruder">30.0</td><td class="value_extruder">30.0</td><td class="value_extruder">40.0</td><td class="value_extruder">50.0</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">80</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Top/Bottom Speed"><td class="CellWithComment">🔑 Top/Bottom Speed<span class="CellComment"><h1>Top/Bottom Speed</h1>
+<p>The speed at which the top and bottom side of the model is printed can be configured separately from the normal print speed.</p>
+<p><img src="./Cura Settings_files/speed_difference.png" width="190.66666666666666"></p>
+<p>This should typically be printed fairly slowly if there is any overhang in the model. If there is not, printing it fast can save a lot of printing time. Printing the top and bottom side of the model slowly will cause the following effects:</p>
+<ul>
+<li>It increases printing time, sometimes drastically. Since the top and bottom sides have long lines, the speed has the greatest effect on printing time, rather than acceleration and jerk. Top and bottom can be a significant part of the total printing time.</li>
+<li>It will improve the quality of overhang, if there is overhang that is very flat. Overhang that is still sloped steeply is not affected much, since the skin in that overhang is not exposed then. Printing overhang more slowly keeps the tension on the strings of filament, allowing it to cool down longer.</li>
+<li>Similar to overhang, it will improve the quality of the top surface. The same overhang effect is applied to the way that the top surface rests on the infill.</li>
+<li>The printer will generally vibrate less. If the build plate vibrates less, the top and bottom will look better.</li>
+</ul>
+<p><strong>This setting has no significant effect on the build plate adhesion. The Initial Layer Print Speed is used for the first few layers.</strong></p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print / 2</td><td class="value_extruder">=speed_print / 2</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print / 2</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Wall Speed"><td class="CellWithComment">🔑 Wall Speed<span class="CellComment"><h1>Wall Speed</h1>
+<p>The speed at which the walls are printed can be configured separately from the normal print speed.</p>
+<p><img src="./Cura Settings_files/speed_difference.png" width="190.66666666666666"></p>
+<p>The walls are the most major factor in the visual quality of a print, so they should look nice. The printing speed of the walls, especially that of the outer wall, is a major factor in how nice these walls look. It is therefore advisable to make the walls print fairly slowly. This reduces vibrations in the printer, which ultimately reduces ringing in your print. It also improves the quality of overhang, because the slower printing speed allows the fans to cool down the walls better, giving it more strength to hang in the air.</p>
+<p>If the wall printing speed is too low however, there is a risk of introducing too great of a flow change. If the nozzle suddenly has to extrude much more slowly, it will still extrude a lot of material for a while while the pressure in the nozzle chamber drops, so at the beginning of the wall it will overextrude.</p>
+<p>The walls are also a significant part of the printing time, so reducing the speed at which the walls are printed will drastically increase the printing time.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print / 2</td><td class="value_extruder">=speed_print / 2</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_print / 2</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Inner Wall Speed"><td class="CellWithComment">🔑 Inner Wall Speed<span class="CellComment"><h1>Inner Wall Speed</h1>
+<p>The speed at which the inner walls are printed can be configured separately from the normal print speed and the outer wall.</p>
+<p><img src="./Cura Settings_files/speed_difference.png" width="190.66666666666666"></p>
+<p>The inner walls are less important for visual quality than the outer walls. However they will influence the placement of the outer walls, causing the material for the outer walls to be pushed outside if the outer wall is printed after the inner walls, or directly pushing the outer wall out if the outer wall is printed first. It is therefore still somewhat important to print the inner walls accurately, but they can be printed a bit faster than the outer walls in order to save time.</p>
+<p>Reducing the speed of the inner wall will reduce vibrations while printing this structure, which reduces ringing. It also improves overhang, because the fans on the print head get more time to cool the material down while it's still being held taut by the nozzle.</p>
+<p>If the inner wall printing speed is too low however, there is a risk of introducing too great of a flow change. If the nozzle suddenly has to extrude much more slowly, it will extrude a lot of material for a while while the pressure in the nozzle chamber drops, so at the beginning of the wall it will overextrude.</p>
+<p>The inner walls are also a significant part of the printing time, so reducing the speed at which the inner walls are printed will drastically increase the printing time.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_wall * 2</td><td class="value_extruder">=speed_wall * 2</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=speed_wall * 2</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Top Layers"><td class="CellWithComment">🔑 Top Layers<span class="CellComment"><h1>Top Layers</h1>
+<p>This setting configures how many solid layers are printed at the top side of the print. These solid layers are printed instead of the infill. They are intended to close the top side.</p>
+<p><img src="./Cura Settings_files/top_bottom_thickness_0.8.png" width="190.66666666666666">
+<img src="./Cura Settings_files/top_thickness.png" width="190.66666666666666"></p>
+<p>More top layers will have several effects, beneficial for the quality of the top surface but detrimental to productivity.</p>
+<ul>
+<li>Your part will be stronger. Having more top layers will mean that a smaller part of your print will get filled with the sparse infill pattern. Instead it gets made completely solid.</li>
+<li>The top surface will be smoother. Any pillowing and sagging in the top skin will get smoothed out in the layers put on top.</li>
+<li>It's more likely that your model will be water tight. More layers on the top side will be able to block water or other fluids from getting in, since more layers are filled completely.</li>
+<li>Your print will use more material, since more layers are filled completely.</li>
+<li>Your print will take longer, since more material must be placed down and these layers are normally printed more slowly than the infill.</li>
+</ul>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=0 if infill_sparse_density == 100 else math.ceil(round(top_thickness / resolveOrValue('layer_height'), 4))</td><td class="value_extruder">=0 if infill_sparse_density == 100 else math.ceil(round(top_thickness / resolveOrValue('layer_height'), 4))</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=0 if infill_sparse_density == 100 else math.ceil(round(top_thickness / resolveOrValue('layer_height'), 4))</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Wall Line Count"><td class="CellWithComment">🔑 Wall Line Count<span class="CellComment"><h1>Wall Line Count</h1>
+<p>This setting determines how many contours will be drawn around the print on every layer.</p>
+<p><img src="./Cura Settings_files/wall_thickness_0.8.png" width="190.66666666666666">
+<img src="./Cura Settings_files/wall_thickness_1.6.png" width="190.66666666666666"></p>
+<p>Only one of the walls will be an outer wall, getting printed with the outer wall settings. The rest of the walls will be printed with the inner wall settings.</p>
+<p>The number of walls is a major factor in how strong the print will be. Since the walls are adjacent, they can reinforce each other leading to a stronger part. For larger prints, this can be a much more effective way to get a strong object than adjusting the infill, depending on the shape.</p>
+<p>Increasing the number of walls will:</p>
+<ul>
+<li>Greatly increase the strength of the print.</li>
+<li>Reduce the shine-through effect where the infill pattern is visible on the outside.</li>
+<li>Improve overhangs, because the wall lines are usually more oriented towards their nearest resting point.</li>
+<li>Make the model watertight more easily.</li>
+<li>Greatly increase the printing time and material usage of the print.</li>
+</ul>
+</span></td><td class="value_extruder">3</td><td class="value_extruder">3</td><td class="value_extruder">1</td><td class="value_extruder">1</td><td class="value_extruder">3</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">3</td><td class="value_extruder">3</td><td class="value_extruder">5</td></tr>
+<tr class="" --data-key="Wall Thickness"><td class="CellWithComment">🔑 Wall Thickness<span class="CellComment"><h1>Wall Thickness</h1>
+<p>This setting determines how thick the wall around the print will be. Ultimately it adjusts the number of inner walls to achieve the desired thickness.</p>
+<p><img src="./Cura Settings_files/wall_thickness_0.8.png" width="190.66666666666666">
+<img src="./Cura Settings_files/wall_thickness_1.6.png" width="190.66666666666666"></p>
+<p>The wall thickness must be a multiple of the wall line width. If it is not, it will be rounded to be an exact multiple. Keep in mind though that one of the walls will be an outer wall, and the rest will be inner walls. These walls can have different line widths.</p>
+<p>The thickness of the walls is a major factor in how strong the print will be. Since the walls are adjacent, they can reinforce each other leading to a stronger part. For larger prints, this can be a much more effective way to get a strong object than adjusting the infill, depending on the shape.</p>
+<p>Increasing the wall thickness will:</p>
+<ul>
+<li>Greatly increase the strength of the print.</li>
+<li>Reduce the shine-through effect where the infill pattern is visible on the outside.</li>
+<li>Improve overhangs, because the wall lines are usually more oriented towards their nearest resting point.</li>
+<li>Make the model watertight more easily.</li>
+<li>Greatly increase the printing time and material usage of the print.</li>
+</ul>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=wall_line_width_0 if magic_spiralize else 0.8</td><td class="value_extruder">=wall_line_width_0 if magic_spiralize else 0.8</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">=wall_line_width_0 if magic_spiralize else 0.8</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+<tr class="" --data-key="Z Seam Alignment"><td class="CellWithComment">🔑 Z Seam Alignment<span class="CellComment"><h1>Z Seam Alignment</h1>
+<p>This setting allows you to choose where the seam of each contour is placed. Several options are available that give great control over where the seam gets placed to minimise its impact or to allow you to remove the seam more easily in post-processing.</p>
+<p>The seam is where the contour starts and ends printing. Even if the path of the nozzle is a closed circle, a seam is still left where the extrusion starts and ends because the printing process is never completely accurate. With this setting the visibility of the seam can be minimised by hiding it somewhere or spreading it around.</p>
+<h2>User specified</h2>
+<p><img src="./Cura Settings_files/z_seam_type_user.png" width="190.66666666666666"></p>
+<p>This option allows you to choose a location manually. The seam will be placed in the corner that is closest to the chosen location. This will usually line up the corners very closely together, which allows you to cut away the seam easily. It also allows fine-grained control over where the seam should be.</p>
+<p>By default a location in the back of the printer is chosen. The idea is that users mostly let the front part of their models face the front side of the printer, so a location in the back will hide the seam better.</p>
+<h2>Shortest</h2>
+<p><img src="./Cura Settings_files/z_seam_type_shortest.png" width="190.66666666666666"></p>
+<p>This option simply minimises the length of travel moves leading towards the seam, making no effort to place it anywhere in particular. Because the travel path is shorter, you'll save a small measure of time on travel moves. The seam will also be slightly smaller, because less ooze will be placed in the location where the nozzle lands on the contour.</p>
+<p>The desired corner preference is still held by picking a corner close to where the nozzle is. Not the very closest corner is chosen, but a weighted preference is used to minimise travel moves somewhat but also use an appropriate corner for the Seam Corner Preference setting.</p>
+<h2>Random</h2>
+<p><img src="./Cura Settings_files/z_seam_type_random.png" width="190.66666666666666"></p>
+<p>A random location around the perimeter is chosen for the seam. This random location is changed in every layer, so the seam will get spread out pretty much evenly around the model. Because the seams of different layers don't line up, the seam will hardly be visible. However, the surface will look altogether slightly messier.</p>
+<h2>Sharpest corner</h2>
+<p><img src="./Cura Settings_files/z_seam_type_sharpest.png" width="190.66666666666666"></p>
+<p>The seam will be placed in the very sharpest corner of the whole contour, according to the corner preference chosen in the Seam Corner Preference setting. This may incur longer travel moves, but ensures that the seam is hidden or exposed maximally according to the preference set for the corners.</p>
+</span></td><td class="value_extruder">-</td><td class="value_extruder">'random'</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td><td class="value_extruder">-</td></tr>
+</tbody></table>
+</div>
+
+</body></html>
